@@ -1,0 +1,452 @@
+{% extends 'base.html' %}
+{% block title %}Agent Dashboard - MediBook{% endblock %}
+
+{% block content %}
+
+{% if request.GET.saved %}
+<div class="alert alert-success" style="margin: 10px 20px; padding: 12px 16px; background: #d4edda; color: #155724; border-radius: 8px; border: 1px solid #c3e6cb;">
+    ✅ Changes saved successfully!
+</div>
+{% endif %}
+
+
+<!-- Header -->
+<div class="dashboard-header">
+    <div class="header-flex-row">
+        <div>
+            <h2><i class="fas fa-user-shield"></i> Agent Dashboard</h2>
+            <p>Welcome, {{ agent.first_name }} {{ agent.last_name }}
+                <span class="agent-id-badge">{{ agent.agent_id }}</span>
+            </p>
+        </div>
+        <a href="/agent-logout/" class="btn logout-btn">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-container">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card stat-clickable" onclick="window.location.href='{% url 'patients_list' %}'">
+            <div class="stat-icon stat-icon-blue"><i class="fas fa-users"></i></div>
+            <h4>{{ total_patients }}</h4>
+            <p >Total Patients</p>
+        </div>
+        <div class="stat-card stat-clickable" onclick="window.location.href='{% url 'doctors_list' %}'">
+            <div class="stat-icon stat-icon-green"><i class="fas fa-user-md"></i></div>
+            <h4>{{ total_doctors }}</h4>
+            <p>Doctors</p>
+        </div>
+        <div class="stat-card stat-clickable" onclick="openModal('addAppointmentModal')">
+            <div class="stat-icon stat-icon-blue"><i class="fas fa-calendar-check"></i></div>
+            <h4>{{ total_appointments }}</h4>
+            <p>Appointments</p>
+        </div>
+        <div class="stat-card stat-clickable" onclick="openModal('addBillModal')">
+            <div class="stat-icon stat-icon-yellow"><i class="fas fa-file-invoice-dollar"></i></div>
+            <h4>{{ pending_bills }}</h4>
+            <p>Unpaid Bills</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions-row">
+        <a href="/agent-dashboard/add-patient/" class="btn btn-primary">
+            <i class="fas fa-user-plus"></i> Add Patient
+        </a>
+        <button onclick="openModal('addDoctorModal')" class="btn btn-secondary">
+            <i class="fas fa-user-md"></i> Add Doctor
+        </button>
+    </div>
+
+    <div class="dashboard-grid">
+
+        <!-- Column 1: Patients -->
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-users icon-blue"></i> All Patients</span>
+            </div>
+            {% for patient in patients %}
+            <a href="/agent-dashboard/patient/{{ patient.id }}/" class="patient-link">
+                <div class="appt-item patient-item">
+                    <div class="appt-info">
+                        <h6>{{ patient.first_name }} {{ patient.last_name }}</h6>
+                        <small class="patient-email">{{ patient.email }}</small><br>
+                        <small class="patient-phone">{{ patient.phone|default:"No phone" }}</small>
+                    </div>
+                    <span class="chevron-icon">&rsaquo;</span>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon">👥</div>
+                <p>No patients yet</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Column 2: Doctors -->
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-user-md icon-green"></i> Doctors</span>
+            </div>
+            {% for doctor in doctors %}
+                <a href="{% url 'doctors_list' %}" style="text-decoration:none; color:inherit;">
+                    <div class="appt-item">
+                    <div class="appt-info">
+                <h6>Dr. {{ doctor.name }}</h6>
+                    <small class="doctor-specialization">{{ doctor.specialization }}</small><br>
+                    <small class="patient-email"><i class="fas fa-envelope"></i> {{ doctor.email }}</small>
+                    </div>
+                <span class="badge badge-confirmed">Active</span>
+                </div>
+                </a>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-icon"></div>
+                <p>No doctors yet</p>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Column 3: Recent Appointments + Messages -->
+        <div>
+            <div class="card mb-2">
+                <div class="card-header">
+                    <span><i class="fas fa-calendar-alt icon-blue"></i> Recent Appointments</span>
+                </div>
+                {% for appt in appointments %}
+                <a href="/agent-dashboard/patient/{{ appt.patient.id }}/" style="text-decoration:none; color:inherit;">
+                    <div class="appt-item">
+                    <div class="appt-info">
+                        <h6>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</h6>
+                            <small class="appt-doctor">Dr. {{ appt.doctor.name }}</small><br>
+                            <small class="appt-datetime"><i class="fas fa-clock"></i> {{ appt.date }} at {{ appt.time }}</small>
+                    </div>
+                    <span class="badge badge-{{ appt.status }}">{{ appt.status|capfirst }}</span>
+                </div>
+        </a>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>No appointments yet</p>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <span>
+                        <i class="fas fa-envelope icon-blue"></i> Messages
+                        {% if unread_messages %}
+                        <span class="unread-count-badge">{{ unread_messages }} new</span>
+                        {% endif %}
+                    </span>
+                </div>
+                
+            {% for msg in messages %}
+                <a href="/agent-dashboard/message/{{ msg.id }}/" style="text-decoration:none; color:inherit;">
+                    <div class="appt-item">
+                        <div class="appt-info">
+                            <h6>{{ msg.subject }}</h6>
+                            <small class="msg-sender">From: {{ msg.sender.first_name }} {{ msg.sender.last_name }}</small><br>
+                            <small class="msg-date">{{ msg.created_at|date:"M d, Y" }}</small>
+                        </div>
+                {% if msg.is_read %}
+                <span class="badge badge-confirmed">Read</span>
+                {% else %}
+                <span class="badge badge-pending">New</span>
+                {% endif %}
+                    </div>
+                </a>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>No messages yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Full searchable tables -->
+    <div class="tab-bar" style="margin-top:24px;">
+        <button class="tab-btn active" onclick="switchTab('tabPatients', this)">
+            <i class="fas fa-users"></i> Patients
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabDoctors', this)">
+            <i class="fas fa-user-md"></i> Doctors
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabAppointments', this)">
+            <i class="fas fa-calendar"></i> Appointments
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabBills', this)">
+            <i class="fas fa-file-invoice-dollar"></i> Bills
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabMessages', this)">
+            <i class="fas fa-envelope"></i> Messages
+        </button>
+    </div>
+
+    <div id="tabPatients" class="tab-content active card">
+        <div class="card-header">
+            <span><i class="fas fa-users icon-blue"></i> All Patients</span>
+            <input type="text" id="patientSearch" onkeyup="filterTable('patientSearch','patientsTable')"
+                placeholder="Search..." class="form-control search-inline">
+        </div>
+        <table class="admin-table" id="patientsTable">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for p in patients %}
+                <tr>
+                    <td><strong>{{ p.first_name }} {{ p.last_name }}</strong></td>
+                    <td>{{ p.email }}</td>
+                    <td>{{ p.phone|default:"—" }}</td>
+                    <td>{{ p.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <a href="/agent-dashboard/patient/{{ p.id }}/" class="btn-sm-primary">
+                            <i class="fas fa-folder-open"></i> Open
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty-cell">No patients yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="tabDoctors" class="tab-content card">
+        <div class="card-header">
+            <span><i class="fas fa-user-md icon-green"></i> Doctors</span>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr><th>Name</th><th>Specialization</th><th>Email</th><th>Phone</th></tr>
+            </thead>
+            <tbody>
+                {% for doc in doctors %}
+                <tr>
+                    <td><strong>Dr. {{ doc.name }}</strong></td>
+                    <td>{{ doc.specialization }}</td>
+                    <td>{{ doc.email }}</td>
+                    <td>{{ doc.phone|default:"—" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty-cell">No doctors yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="tabAppointments" class="tab-content card">
+        <div class="card-header">
+            <span><i class="fas fa-calendar icon-blue"></i> All Appointments</span>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for appt in appointments %}
+                <tr>
+                    <td>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</td>
+                    <td>Dr. {{ appt.doctor.name }}</td>
+                    <td>{{ appt.date }}</td>
+                    <td>{{ appt.time }}</td>
+                    <td><span class="badge badge-{{ appt.status }}">{{ appt.status|capfirst }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty-cell">No appointments</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="tabBills" class="tab-content card">
+        <div class="card-header">
+            <span><i class="fas fa-file-invoice-dollar icon-yellow"></i> All Bills</span>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr><th>Patient</th><th>Amount</th><th>Due Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for bill in bills %}
+                <tr>
+                    <td>{{ bill.patient.first_name }} {{ bill.patient.last_name }}</td>
+                    <td>${{ bill.amount }}</td>
+                    <td>{{ bill.due_date }}</td>
+                    <td><span class="badge badge-{{ bill.status }}">{{ bill.status|capfirst }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty-cell">No bills</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="tabMessages" class="tab-content card">
+        <div class="card-header">
+            <span><i class="fas fa-envelope icon-blue"></i> Messages</span>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr><th>Subject</th><th>From</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for msg in messages %}
+                <tr>
+                    <td>{{ msg.subject }}</td>
+                    <td>{{ msg.sender.first_name }} {{ msg.sender.last_name }}</td>
+                    <td>{{ msg.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        {% if msg.is_read %}
+                        <span class="badge badge-confirmed">Read</span>
+                        {% else %}
+                        <span class="badge badge-pending">New</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty-cell">No messages</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div><!-- end dashboard-container -->
+
+<!-- ============================================================
+    MODALS
+    ============================================================ -->
+
+<!-- Add Doctor -->
+<div id="addDoctorModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('addDoctorModal')">✕</button>
+        <h3 class="modal-title"><i class="fas fa-user-md"></i> Add New Doctor</h3>
+        <form method="POST" action="/agent-dashboard/add-doctor/">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Name</label>
+                    <input type="text" name="name" class="form-control" placeholder="Doctor name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Specialization</label>
+                    <input type="text" name="specialization" class="form-control" placeholder="e.g. Cardiology" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" placeholder="doctor@clinic.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="text" name="phone" class="form-control" placeholder="+1 555 0000">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                <textarea name="bio" class="form-control" rows="2" placeholder="Short bio..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fas fa-plus"></i> Add Doctor
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Appointment -->
+<div id="addAppointmentModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('addAppointmentModal')">✕</button>
+        <h3 class="modal-title"><i class="fas fa-calendar-plus"></i> Add Appointment</h3>
+        <form method="POST" action="/agent-dashboard/add-appointment/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Patient</label>
+                <select name="patient_id" class="form-control" required>
+                    <option value="">-- Select Patient --</option>
+                    {% for patient in patients %}
+                    <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Doctor</label>
+                <select name="doctor_id" class="form-control" required onchange="loadAvailableSlots()">
+                    <option value="">-- Select Doctor --</option>
+                    {% for doctor in doctors %}
+                    <option value="{{ doctor.id }}">Dr. {{ doctor.name }} — {{ doctor.specialization }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" name="date" id="apptDate" class="form-control" required min="{{ today }}" onchange="loadAvailableSlots()">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Available Time Slots</label>
+                <div id="timeSlotsContainer" class="slots-grid">
+                    <p class="slots-placeholder">Select a doctor and date first</p>
+                </div>
+                <input type="hidden" name="time" id="selectedTime" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea name="notes" class="form-control" rows="2" placeholder="Optional notes..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fas fa-plus"></i> Book Appointment
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Add Bill -->
+<div id="addBillModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('addBillModal')">✕</button>
+        <h3 class="modal-title"><i class="fas fa-file-invoice-dollar"></i> Add Bill</h3>
+        <form method="POST" action="/agent-dashboard/add-bill/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Patient</label>
+                <select name="patient_id" class="form-control" required>
+                    <option value="">-- Select Patient --</option>
+                    {% for patient in patients %}
+                    <option value="{{ patient.id }}">{{ patient.first_name }} {{ patient.last_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Amount ($)</label>
+                    <input type="number" name="amount" class="form-control" placeholder="0.00" step="0.01" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Due Date</label>
+                    <input type="date" name="due_date" class="form-control" required min="{{ today }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description</label>
+                <textarea name="description" class="form-control" rows="2" placeholder="Bill description..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fas fa-plus"></i> Add Bill
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

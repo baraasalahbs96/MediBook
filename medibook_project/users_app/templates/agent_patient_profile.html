@@ -1,0 +1,705 @@
+{% extends 'base.html' %}
+{% block title %}
+    {% if view == 'add_patient' %}Add Patient - MediBook
+    {% else %}{{ patient.first_name }} {{ patient.last_name }} - MediBook
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+
+
+{% if view == 'add_patient' %}
+<!-- ============================================================
+    ADD PATIENT FORM
+    ============================================================ -->
+
+<div class="dashboard-header">
+    <h2><i class="fas fa-user-plus"></i> Add New Patient</h2>
+    <p>Register a new patient to the system</p>
+</div>
+
+<div class="dashboard-container">
+
+    <div class="form-wrapper">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-user-plus icon-blue"></i> Patient Information</span>
+                <a href="/agent-dashboard/" class="btn btn-sm btn-outline-primary">← Back</a>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/agent-dashboard/add-patient/">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name"
+                                class="form-control {% if errors.first_name %}is-invalid{% endif %}"
+                                placeholder="First name"
+                                value="{{ data.first_name|default:'' }}">
+                            {% if errors.first_name %}
+                            <span class="error-msg">
+                                <i class="fas fa-exclamation-circle"></i> {{ errors.first_name }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name"
+                                class="form-control {% if errors.last_name %}is-invalid{% endif %}"
+                                placeholder="Last name"
+                                value="{{ data.last_name|default:'' }}">
+                            {% if errors.last_name %}
+                            <span class="error-msg">
+                                <i class="fas fa-exclamation-circle"></i> {{ errors.last_name }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email"
+                                class="form-control {% if errors.email %}is-invalid{% endif %}"
+                                placeholder="patient@email.com"
+                                value="{{ data.email|default:'' }}">
+                            {% if errors.email %}
+                            <span class="error-msg">
+                                <i class="fas fa-exclamation-circle"></i> {{ errors.email }}
+                            </span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone"
+                                class="form-control"
+                                placeholder="+1 555 0000"
+                                value="{{ data.phone|default:'' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Temporary Password</label>
+                        <input type="text" name="password"
+                            class="form-control"
+                            placeholder="Default: medibook123"
+                            value="{{ data.password|default:'medibook123' }}">
+                        <small class="password-hint">Patient can change this after first login</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">
+                        <i class="fas fa-user-plus"></i> Add Patient
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+
+
+{% if request.GET.saved %}
+<div class="alert alert-success" style="margin: 10px 20px; padding: 12px 16px; background: #d4edda; color: #155724; border-radius: 8px; border: 1px solid #c3e6cb;">
+    ✅ Changes saved successfully!
+</div>
+{% endif %}
+<!-- ============================================================
+    PATIENT DETAIL PAGE
+    ============================================================ -->
+
+<div class="dashboard-header">
+    <div class="header-flex-row">
+        <div class="header-left">
+            <a href="/agent-dashboard/" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="profile-pic-wrapper">
+                {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" alt="Photo">
+                {% else %}
+                    <i class="fas fa-user"></i>
+                {% endif %}
+            </div>
+            <div class="header-info">
+                <h2>{{ patient.first_name }} {{ patient.last_name }}</h2>
+                <p>
+                    {{ patient.email }}
+                    {% if profile.blood_type %}· Blood: <strong>{{ profile.blood_type }}</strong>{% endif %}
+                </p>
+            </div>
+        </div>
+        <a href="/agent-dashboard/" class="btn logout-btn">
+            <i class="fas fa-arrow-left"></i> Back
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-container">
+
+    <!-- Tab Bar -->
+    <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('tabProfile', this)">
+            <i class="fas fa-user"></i> Profile
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabHealth', this)">
+            <i class="fas fa-heartbeat"></i> Health
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabLab', this)">
+            <i class="fas fa-flask"></i> Lab Results
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabAppts', this)">
+            <i class="fas fa-calendar"></i> Appointments
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabBills', this)">
+            <i class="fas fa-file-invoice-dollar"></i> Bills
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabFiles', this)">
+            <i class="fas fa-paperclip"></i> Files
+        </button>
+        <button class="tab-btn" onclick="switchTab('tabMessages', this)">
+            <i class="fas fa-envelope"></i> Messages
+        </button>
+    </div>
+
+    <!-- ===== Profile Tab ===== -->
+    <div id="tabProfile" class="tab-content active">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-user icon-blue"></i> Personal Information</span>
+            </div>
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_profile">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-control"
+                                value="{{ patient.first_name }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-control"
+                                value="{{ patient.last_name }}" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="phone" class="form-control"
+                                value="{{ patient.phone }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date of Birth</label>
+                            <input type="date" name="date_of_birth" class="form-control"
+                                value="{{ profile.date_of_birth|date:'Y-m-d' }}">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select name="gender" class="form-control">
+                                <option value="">—</option>
+                                <option value="Male"   {% if profile.gender == 'Male' %}selected{% endif %}>Male</option>
+                                <option value="Female" {% if profile.gender == 'Female' %}selected{% endif %}>Female</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Blood Type</label>
+                            <select name="blood_type" class="form-control">
+                                <option value="">—</option>
+                                {% for bt in blood_types %}
+                                    <option value="{{ bt }}" {% if profile.blood_type == bt %}selected{% endif %}>{{ bt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address</label>
+                        <input type="text" name="address" class="form-control" value="{{ profile.address }}">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Allergies</label>
+                        <textarea name="allergies" class="form-control" rows="2">{{ profile.allergies }}</textarea>
+                    </div>
+
+                    <h4 class="section-subtitle"><i class="fas fa-shield-alt section-icon"></i> Insurance</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Insurance Provider</label>
+                            <input type="text" name="insurance_provider" class="form-control"
+                                value="{{ profile.insurance_provider }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Insurance Number</label>
+                            <input type="text" name="insurance_number" class="form-control"
+                                value="{{ profile.insurance_number }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Insurance Expiry</label>
+                        <input type="date" name="insurance_expiry" class="form-control"
+                            value="{{ profile.insurance_expiry|date:'Y-m-d' }}">
+                    </div>
+
+                    <h4 class="section-subtitle"><i class="fas fa-phone section-icon"></i> Emergency Contact</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="emergency_contact_name" class="form-control"
+                                value="{{ profile.emergency_contact_name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="emergency_contact_phone" class="form-control"
+                                value="{{ profile.emergency_contact_phone }}">
+                        </div>
+                    </div>
+
+                    <h4 class="section-subtitle"><i class="fas fa-camera section-icon"></i> Profile Picture</h4>
+                    <div class="form-group">
+                        <input type="file" name="profile_picture" class="form-control" accept="image/*">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Health Tab ===== -->
+    <div id="tabHealth" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-heartbeat icon-blue"></i> Health Summary & Vitals</span>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_health">
+                <div class="card-body">
+                    <h4 class="section-subtitle-sm">Vitals</h4>
+                    <div class="vitals-grid">
+                        <div class="vital-card">
+                            <input type="text" name="vitals_bp" class="form-control"
+                                value="{{ health.vitals_bp }}" placeholder="120/80">
+                            <div class="vital-label">Blood Pressure</div>
+                        </div>
+                        <div class="vital-card">
+                            <input type="text" name="vitals_pulse" class="form-control"
+                                value="{{ health.vitals_pulse }}" placeholder="72 bpm">
+                            <div class="vital-label">Pulse</div>
+                        </div>
+                        <div class="vital-card">
+                            <input type="text" name="vitals_temp" class="form-control"
+                                value="{{ health.vitals_temp }}" placeholder="98.6°F">
+                            <div class="vital-label">Temperature</div>
+                        </div>
+                        <div class="vital-card">
+                            <input type="text" name="vitals_weight" class="form-control"
+                                value="{{ health.vitals_weight }}" placeholder="70 kg">
+                            <div class="vital-label">Weight</div>
+                        </div>
+                        <div class="vital-card">
+                            <input type="text" name="vitals_height" class="form-control"
+                                value="{{ health.vitals_height }}" placeholder="175 cm">
+                            <div class="vital-label">Height</div>
+                        </div>
+                    </div>
+                    <div class="form-group mt-20">
+                        <label class="form-label">Chief Complaint</label>
+                        <textarea name="chief_complaint" class="form-control" rows="2">{{ health.chief_complaint }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Diagnosis</label>
+                        <textarea name="diagnosis" class="form-control" rows="2">{{ health.diagnosis }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Treatment Plan</label>
+                        <textarea name="treatment_plan" class="form-control" rows="3">{{ health.treatment_plan }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Health Summary
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card card-mt">
+            <div class="card-header">
+                <span><i class="fas fa-notes-medical icon-blue"></i> Medical Record</span>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update_record">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Medications</label>
+                        <textarea name="medications" class="form-control" rows="2">{{ record.medications }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Conditions</label>
+                        <textarea name="conditions" class="form-control" rows="2">{{ record.conditions }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Procedures</label>
+                        <textarea name="procedures" class="form-control" rows="2">{{ record.procedures }}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="2">{{ record.notes }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Record
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ===== Lab Results Tab ===== -->
+    <div id="tabLab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-flask icon-blue"></i> Lab Results</span>
+                <button onclick="openModal('addLabModal')" class="btn-sm-primary">
+                    <i class="fas fa-plus"></i> Add Result
+                </button>
+            </div>
+            {% for lab in lab_results %}
+            <div class="lab-item">
+                <div class="lab-item-inner">
+                    <div>
+                        <strong>{{ lab.test_name }}</strong>
+                        <span class="lab-badge-{{ lab.status }}">{{ lab.status|capfirst }}</span>
+                        <div class="lab-meta">
+                            Result: {{ lab.result }}
+                            {% if lab.normal_range %} · Normal: {{ lab.normal_range }}{% endif %}
+                        </div>
+                        <div class="lab-date">{{ lab.test_date }}</div>
+                        {% if lab.notes %}<div class="lab-notes">{{ lab.notes }}</div>{% endif %}
+                    </div>
+                    <div class="lab-actions">
+                        {% if lab.file %}
+                        <a href="{{ lab.file.url }}" target="_blank" class="btn-sm-primary">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        {% endif %}
+                        <form method="POST" class="inline-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete_lab">
+                            <input type="hidden" name="lab_id" value="{{ lab.id }}">
+                            <button type="submit" class="btn-sm-danger"
+                                onclick="return confirm('Delete this result?')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state"><p>No lab results yet</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== Appointments Tab ===== -->
+    <div id="tabAppts" class="tab-content">
+
+        <!-- Quick add appointment, inline -->
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-calendar-plus icon-blue"></i> Add Appointment</span>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_appointment">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Doctor</label>
+                        <select name="doctor_id" class="form-control" required>
+                            <option value="">-- Select Doctor --</option>
+                            {% for doc in doctors %}
+                            <option value="{{ doc.id }}">Dr. {{ doc.name }} — {{ doc.specialization }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date</label>
+                            <input type="date" name="date" class="form-control" required min="{{ today }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Time</label>
+                            <input type="time" name="time" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" class="form-control" rows="2" placeholder="Optional"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Appointment
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Appointments list -->
+        <div class="card card-mt">
+            <div class="card-header">
+                <span><i class="fas fa-calendar icon-blue"></i> Appointment History</span>
+            </div>
+            {% for appt in appointments %}
+            <div class="appt-item">
+                <div class="appt-info">
+                    <h6>Dr. {{ appt.doctor.name }} — {{ appt.doctor.specialization }}</h6>
+                    <small>{{ appt.date }} · {{ appt.time }}</small>
+                    {% if appt.notes %}<small class="appt-notes"> · {{ appt.notes }}</small>{% endif %}
+                </div>
+                <div class="appt-actions">
+                    <span class="badge badge-{{ appt.status }}">{{ appt.status|capfirst }}</span>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="update_appt_status">
+                        <input type="hidden" name="appt_id" value="{{ appt.id }}">
+                        <select name="status" class="form-control status-select" onchange="this.form.submit()">
+                            <option value="pending"   {% if appt.status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="confirmed" {% if appt.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                            <option value="completed" {% if appt.status == 'completed' %}selected{% endif %}>Completed</option>
+                            <option value="cancelled" {% if appt.status == 'cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state"><p>No appointments</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== Bills Tab ===== -->
+    <div id="tabBills" class="tab-content">
+
+        <!-- Quick add bill, inline -->
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-file-invoice-dollar icon-yellow"></i> Add Bill</span>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add_bill">
+                <div class="card-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Amount ($)</label>
+                            <input type="number" name="amount" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Due Date</label>
+                            <input type="date" name="due_date" class="form-control" required min="{{ today }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="2"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Bill
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bills list -->
+        <div class="card card-mt">
+            <div class="card-header">
+                <span><i class="fas fa-file-invoice icon-yellow"></i> Bill History</span>
+            </div>
+            {% for bill in bills %}
+            <div class="appt-item">
+                <div class="appt-info">
+                    <h6>${{ bill.amount }} — {{ bill.description|default:"No description" }}</h6>
+                    <small>Due: {{ bill.due_date }}</small>
+                </div>
+                <div class="appt-actions">
+                    <span class="badge badge-{{ bill.status }}">{{ bill.status|capfirst }}</span>
+                    {% if bill.status != 'paid' %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="mark_paid">
+                        <input type="hidden" name="bill_id" value="{{ bill.id }}">
+                        <button type="submit" class="btn-sm-primary">Mark Paid</button>
+                    </form>
+                    {% else %}
+                    <span class="paid-label">✓ Paid</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state"><p>No bills</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== Files Tab ===== -->
+    <div id="tabFiles" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-paperclip icon-blue"></i> Patient Files</span>
+                <button onclick="openModal('addFileModal')" class="btn-sm-primary">
+                    <i class="fas fa-upload"></i> Upload
+                </button>
+            </div>
+            {% for pf in patient_files %}
+            <div class="appt-item">
+                <div class="appt-info">
+                    <h6>{{ pf.name }}</h6>
+                    <small>{{ pf.file_type }} · {{ pf.created_at|date:"M d, Y" }} · by {{ pf.uploaded_by }}</small>
+                </div>
+                <a href="{{ pf.file.url }}" target="_blank" class="btn-sm-primary">
+                    <i class="fas fa-download"></i> Download
+                </a>
+            </div>
+            {% empty %}
+            <div class="empty-state"><p>No files uploaded</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ===== Messages Tab ===== -->
+    <div id="tabMessages" class="tab-content">
+
+        <!-- Quick send message, inline -->
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-paper-plane icon-blue"></i> Send Message</span>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="send_message">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" name="subject" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Message</label>
+                        <textarea name="body" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Message history -->
+        <div class="card card-mt">
+            <div class="card-header">
+                <span><i class="fas fa-inbox icon-blue"></i> Message History</span>
+            </div>
+            {% for msg in messages %}
+            <div class="appt-item">
+                <div class="appt-info">
+                    <h6>{{ msg.subject }}</h6>
+                    <small>{{ msg.created_at|date:"M d, Y" }}</small>
+                    <p class="msg-preview">{{ msg.body|truncatechars:100 }}</p>
+                </div>
+                {% if msg.is_read %}
+                    <span class="badge badge-confirmed">Read</span>
+                {% else %}
+                    <span class="badge badge-pending">New</span>
+                {% endif %}
+            </div>
+            {% empty %}
+            <div class="empty-state"><p>No messages</p></div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div><!-- end dashboard-container -->
+
+<!-- ============================================================
+        MODALS (only for forms that need extra fields / files)
+    ============================================================ -->
+
+<!-- Add Lab Result -->
+<div id="addLabModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('addLabModal')">✕</button>
+        <h3 class="modal-title"><i class="fas fa-flask"></i> Add Lab Result</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_lab">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Test Name</label>
+                    <input type="text" name="test_name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Test Date</label>
+                    <input type="date" name="test_date" class="form-control" required max="{{ today }}">
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Result</label>
+                <textarea name="result" class="form-control" rows="2" required></textarea>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Normal Range</label>
+                    <input type="text" name="normal_range" class="form-control" placeholder="e.g. 70-100">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Status</label>
+                    <select name="lab_status" class="form-control">
+                        <option value="normal">Normal</option>
+                        <option value="abnormal">Abnormal</option>
+                        <option value="pending">Pending</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Notes</label>
+                <textarea name="lab_notes" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Attach File (optional)</label>
+                <input type="file" name="lab_file" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fas fa-plus"></i> Add Result
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Upload File -->
+<div id="addFileModal" class="modal-overlay">
+    <div class="modal-box">
+        <button class="modal-close" onclick="closeModal('addFileModal')">✕</button>
+        <h3 class="modal-title"><i class="fas fa-upload"></i> Upload File</h3>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_file">
+            <div class="form-group">
+                <label class="form-label">File Name</label>
+                <input type="text" name="file_name" class="form-control" placeholder="e.g. X-Ray Report">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Select File</label>
+                <input type="file" name="patient_file" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full">
+                <i class="fas fa-upload"></i> Upload
+            </button>
+        </form>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}

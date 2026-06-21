@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% block title %}My Health - MediBook{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <h2><i class="fas fa-heartbeat"></i> My Health Records</h2>
+    <p>Your complete medical information</p>
+</div>
+
+<div style="padding: 10px 20px;">
+    <button onclick="history.back()" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+</div>
+
+
+<div class="dashboard-container">
+
+    <!-- Medical Cards Grid -->
+    <div class="health-grid">
+
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-pills icon-primary"></i>Medications</span>
+            </div>
+            <div class="card-body">
+                {% if record.medications %}
+                <p class="record-text">{{ record.medications }}</p>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>No medications on record</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-notes-medical icon-primary"></i>Conditions</span>
+            </div>
+            <div class="card-body">
+                {% if record.conditions %}
+                <p class="record-text">{{ record.conditions }}</p>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">🩺</div>
+                    <p>No conditions on record</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-procedures icon-primary"></i>Procedures</span>
+            </div>
+            <div class="card-body">
+                {% if record.procedures %}
+                <p class="record-text">{{ record.procedures }}</p>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>No procedures on record</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-sticky-note icon-primary"></i>Doctor Notes</span>
+            </div>
+            <div class="card-body">
+                {% if record.notes %}
+                <p class="record-text">{{ record.notes }}</p>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>No notes on record</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Patient Information -->
+    <div class="section-mt">
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-info-circle icon-primary"></i>Patient Information</span>
+            </div>
+            <div class="card-body">
+                <div class="info-grid">
+                    <div>
+                        <p class="form-label">Full Name</p>
+                        <p class="info-value">{{ user.first_name }} {{ user.last_name }}</p>
+                    </div>
+                    <div>
+                        <p class="form-label">Email</p>
+                        <p class="info-value">{{ user.email }}</p>
+                    </div>
+                    <div>
+                        <p class="form-label">Phone</p>
+                        <p class="info-value">{{ user.phone|default:"Not provided" }}</p>
+                    </div>
+                    <div>
+                        <p class="form-label">Last Updated</p>
+                        <p class="info-value">{{ record.updated_at|date:"M d, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Note -->
+    <div class="health-footer">
+        <p>
+            <i class="fas fa-info-circle"></i>
+            To update your medical records, please contact your care team via
+            <a href="/messages/" class="link-primary">Messages</a>.
+        </p>
+    </div>
+
+</div>
+{% endblock %}

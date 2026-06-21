@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Appointments - MediBook{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <h2><i class="fas fa-calendar-alt"></i> Appointments</h2>
+    <p>Manage your upcoming and past appointments</p>
+</div>
+
+<div style="padding: 10px 20px;">
+    <button onclick="history.back()" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+</div>
+
+<div class="dashboard-container">
+    <div class="dashboard-grid">
+
+        <!-- Book Appointment Form -->
+        <div>
+            <div class="card mb-2">
+                <div class="card-header">
+                    <span>
+                        <i class="fas fa-calendar-plus icon-primary"></i>
+                        Book New Appointment
+                    </span>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="/appointments/">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <label class="form-label">Select Doctor</label>
+                            <select name="doctor_id" class="form-control {% if errors.doctor %}is-invalid{% endif %}">
+                                <option value="">-- Choose a doctor --</option>
+                                {% for doctor in doctors %}
+                                <option value="{{ doctor.id }}"
+                                    {% if data.doctor_id == doctor.id|stringformat:"s" %}selected{% endif %}>
+                                    Dr. {{ doctor.name }} — {{ doctor.specialization }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                            {% if errors.doctor %}
+                            <span class="error-msg">
+                                <i class="fas fa-exclamation-circle"></i> {{ errors.doctor }}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" name="date"
+                                    class="form-control {% if errors.date %}is-invalid{% endif %}"
+                                    value="{{ data.date|default:'' }}">
+                                {% if errors.date %}
+                                <span class="error-msg">
+                                    <i class="fas fa-exclamation-circle"></i> {{ errors.date }}
+                                </span>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Time</label>
+                                <input type="time" name="time"
+                                    class="form-control {% if errors.time %}is-invalid{% endif %}"
+                                    value="{{ data.time|default:'' }}">
+                                {% if errors.time %}
+                                <span class="error-msg">
+                                    <i class="fas fa-exclamation-circle"></i> {{ errors.time }}
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Notes (optional)</label>
+                            <textarea name="notes" class="form-control" rows="3"
+                                placeholder="Any special notes...">{{ data.notes|default:'' }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-full">
+                            <i class="fas fa-calendar-check"></i> Book Appointment
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Past Appointments -->
+            {% if past %}
+            <div class="card">
+                <div class="card-header">
+                    <span>
+                        <i class="fas fa-history icon-muted"></i>
+                        Past Appointments
+                    </span>
+                </div>
+                {% for appt in past %}
+                <div class="appt-item">
+                    <div class="appt-info">
+                        <h6>Dr. {{ appt.doctor.name }}</h6>
+                        <small><i class="fas fa-clock"></i> {{ appt.date }} at {{ appt.time }}</small>
+                    </div>
+                    <span class="badge badge-{{ appt.status }}">{{ appt.status|capfirst }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Upcoming Appointments -->
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <span>
+                        <i class="fas fa-calendar-check icon-primary"></i>
+                        Upcoming Appointments
+                    </span>
+                </div>
+                {% if upcoming %}
+                    {% for appt in upcoming %}
+                    <div class="appt-item">
+                        <div class="appt-info">
+                            <h6>Dr. {{ appt.doctor.name }}</h6>
+                            <small class="text-muted">{{ appt.doctor.specialization }}</small><br>
+                            <small><i class="fas fa-clock"></i> {{ appt.date }} at {{ appt.time }}</small>
+                            {% if appt.notes %}
+                            <br>
+                            <small class="text-muted">
+                                <i class="fas fa-sticky-note"></i> {{ appt.notes }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        <div class="appt-actions">
+                            <span class="badge badge-{{ appt.status }}">{{ appt.status|capfirst }}</span>
+                            <a href="/appointments/cancel/{{ appt.id }}/"
+                                class="btn btn-sm btn-cancel"
+                                data-confirm="Cancel this appointment?">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon"></div>
+                    <p>No upcoming appointments</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

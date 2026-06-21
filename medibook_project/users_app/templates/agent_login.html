@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Agent Login - MediBook{% endblock %}
+
+{% block content %}
+<section class="auth-section">
+    <div class="auth-card">
+        <div class="auth-icon">
+            <i class="fas fa-user-shield"></i>
+        </div>
+        <h2 class="auth-title">Agent Login</h2>
+        <p class="auth-sub">MediBook Clinic Management Portal</p>
+
+        {% if errors.login %}
+        <div class="alert-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ errors.login }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/agent-login/">
+            {% csrf_token %}
+            <div class="form-group">
+                <label class="form-label">Agent ID</label>
+                <input type="text" name="agent_id"
+                    class="form-control {% if errors.agent_id %}is-invalid{% endif %}"
+                    placeholder="e.g. AGT-0001"
+                    value="{{ request.POST.agent_id }}"
+                    autofocus>
+                {% if errors.agent_id %}
+                <span class="error-msg"><i class="fas fa-exclamation-circle"></i> {{ errors.agent_id }}</span>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="password" name="password" id="passwordField"
+                        class="form-control {% if errors.password %}is-invalid{% endif %}"
+                        placeholder="Enter your password">
+                    <button type="button" class="input-group-btn" id="toggleBtn">
+                        <i class="fas fa-eye" id="eyeIcon1"></i>
+                    </button>
+                </div>
+                {% if errors.password %}
+                <span class="error-msg"><i class="fas fa-exclamation-circle"></i> {{ errors.password }}</span>
+                {% endif %}
+            </div>
+            <button type="submit" class="btn btn-primary btn-full btn-agent">
+                <i class="fas fa-sign-in-alt"></i> Login as Agent
+            </button>
+        </form>
+
+        <hr class="auth-divider">
+        <p class="auth-link">
+            New agent? <a href="/agent-register/">Create Agent Account</a>
+        </p>
+        <p class="auth-link auth-link--mt">
+            Patient? <a href="/login/">Login here</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

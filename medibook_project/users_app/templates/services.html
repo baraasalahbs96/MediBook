@@ -1,0 +1,120 @@
+
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Our Services - MediBook{% endblock %}
+
+{% block content %}
+
+<!-- ===== HERO ===== -->
+<section class="about-hero">
+    <h1><i class="fas fa-stethoscope"></i> Our Services</h1>
+    <p>Everything you need to manage your health — all in one place.</p>
+</section>
+
+<!-- ===== MAIN SERVICES ===== -->
+<section class="section">
+    <h2 class="section-title">What We Offer</h2>
+    <p class="section-sub">Comprehensive healthcare services designed around you</p>
+
+    <div class="services-grid">
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-calendar-check"></i></div>
+            <h5>Online Appointments</h5>
+            <p>Book, reschedule, or cancel appointments with your doctor anytime, from any device.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-file-medical"></i></div>
+            <h5>Medical Records</h5>
+            <p>Access your full health history, lab results, and prescriptions securely online.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-pills"></i></div>
+            <h5>Prescriptions</h5>
+            <p>View and manage your prescriptions. Get renewal reminders sent directly to you.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-flask"></i></div>
+            <h5>Lab Results</h5>
+            <p>Receive your lab results digitally as soon as they are ready, with doctor notes.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-credit-card"></i></div>
+            <h5>Online Billing</h5>
+            <p>Pay your bills online, view invoices, and track your payment history with ease.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-envelope-open-text"></i></div>
+            <h5>Secure Messaging</h5>
+            <p>Communicate directly with your clinic team for questions, follow-ups, and updates.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-heartbeat"></i></div>
+            <h5>Health Monitoring</h5>
+            <p>Track your vitals — blood pressure, weight, glucose — and share data with your doctor.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+            <h5>Insurance Support</h5>
+            <p>Submit insurance claims and verify coverage directly through the platform.</p>
+        </div>
+
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-bell"></i></div>
+            <h5>Smart Reminders</h5>
+            <p>Never miss an appointment or medication. Get reminders via email or SMS.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== HOW IT WORKS ===== -->
+<section class="section bg-light">
+    <h2 class="section-title">How It Works</h2>
+    <p class="section-sub">Get started in three simple steps</p>
+
+    <div class="steps-grid">
+
+        <div class="step-item">
+            <div class="step-number">1</div>
+            <h5>Create Account</h5>
+            <p>Register in under a minute with your basic details.</p>
+        </div>
+
+        <div class="step-item">
+            <div class="step-number">2</div>
+            <h5>Book Appointment</h5>
+            <p>Choose your doctor, pick a date and time that suits you.</p>
+        </div>
+
+        <div class="step-item">
+            <div class="step-number">3</div>
+            <h5>Manage Your Health</h5>
+            <p>Access records, results, and billing all from your dashboard.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="cta-section">
+    <h2>Ready to get started?</h2>
+    <p>Join thousands of patients managing their health smarter with MediBook.</p>
+    <div class="cta-buttons">
+        <a href="/register/" class="btn btn-outline">
+            <i class="fas fa-user-plus"></i> Create Free Account
+        </a>
+        <a href="/login/" class="btn btn-outline">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+    </div>
+</section>
+
+{% endblock %}

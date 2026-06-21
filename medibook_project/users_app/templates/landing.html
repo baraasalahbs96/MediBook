@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block title %}MediBook - Smart Clinic Management{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="hero">
+    <h1>♥ MediBook</h1>
+    <p>Your Smart Clinic Management System<br>Book appointments • Manage health records • Pay bills online</p>
+    <div class="hero-btns">
+        <a href="/register/" class="btn btn-outline">
+            <i class="fas fa-user-plus"></i> Get Started
+        </a>
+        <a href="/login/" class="btn" style="background:rgba(255,255,255,0.2); color:white; border:2px solid rgba(255,255,255,0.4);">
+            <i class="fas fa-sign-in-alt"></i> Login
+        </a>
+    </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-item">
+        <h2>500+</h2>
+        <p>Happy Patients</p>
+    </div>
+    <div class="stat-item">
+        <h2>20+</h2>
+        <p>Specialist Doctors</p>
+    </div>
+    <div class="stat-item">
+        <h2>10+</h2>
+        <p>Years Experience</p>
+    </div>
+    <div class="stat-item">
+        <h2>24/7</h2>
+        <p>Online Access</p>
+    </div>
+</div>
+
+<!-- Services -->
+<section class="section">
+    <h2 class="section-title">Our Services</h2>
+    <p class="section-sub">Everything you need to manage your health</p>
+    <div class="services-grid">
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-calendar-check"></i></div>
+            <h5>Easy Appointments</h5>
+            <p>Book, reschedule or cancel appointments with your doctor in seconds.</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-file-medical"></i></div>
+            <h5>Medical Records</h5>
+            <p>Access your full medical history, medications and test results anytime.</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-credit-card"></i></div>
+            <h5>Online Billing</h5>
+            <p>View and pay your bills securely online without visiting the clinic.</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-comments"></i></div>
+            <h5>Messaging</h5>
+            <p>Send messages directly to your care team and get timely responses.</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-bell"></i></div>
+            <h5>Email Notifications</h5>
+            <p>Receive automatic reminders for appointments and payment due dates.</p>
+        </div>
+        <div class="service-card">
+            <div class="service-icon"><i class="fas fa-shield-alt"></i></div>
+            <h5>Secure & Private</h5>
+            <p>Your health data is encrypted and protected at all times.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Doctors -->
+{% if doctors %}
+<section class="section bg-light">
+    <h2 class="section-title">Meet Our Doctors</h2>
+    <p class="section-sub">Expert care from experienced specialists</p>
+    <div class="doctors-grid">
+        {% for doctor in doctors %}
+        <div class="doctor-card">
+            <div class="doctor-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <h5>Dr. {{ doctor.name }}</h5>
+            <p class="spec">{{ doctor.specialization }}</p>
+            <p>{{ doctor.bio|truncatechars:80 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- CTA -->
+<section class="cta-section">
+    <h2>Ready to take control of your health?</h2>
+    <p>Join thousands of patients who trust MediBook</p>
+    <a href="/register/" class="btn" style="background:white; color:var(--primary); font-weight:700;">
+        <i class="fas fa-user-plus"></i> Create Account
+    </a>
+</section>
+
+{% endblock %}

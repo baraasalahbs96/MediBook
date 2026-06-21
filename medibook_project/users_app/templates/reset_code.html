@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Enter Reset Code - MediBook{% endblock %}
+
+{% block content %}
+
+<section class="auth-section">
+    <div class="auth-card">
+
+        <!-- Step Indicator -->
+        <div class="steps">
+            <div class="step done"><i class="fas fa-check"></i></div>
+            <div class="step-line done"></div>
+            <div class="step active">2</div>
+            <div class="step-line"></div>
+            <div class="step">3</div>
+        </div>
+
+        <div class="auth-icon auth-icon-green">
+            <i class="fas fa-envelope-open-text"></i>
+        </div>
+        <h2 class="auth-title">Check Your Email</h2>
+        <p class="auth-sub">We sent a 6-digit code to your email. Enter it below.</p>
+
+        {% if errors.code %}
+        <div class="alert-error">
+            <i class="fas fa-exclamation-triangle"></i> {{ errors.code }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/reset-code/">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label code-label">6-Digit Code</label>
+                <input
+                    type="text"
+                    name="code"
+                    id="codeInput"
+                    class="form-control code-input {% if errors.code %}is-invalid{% endif %}"
+                    placeholder="• • • • • •"
+                    maxlength="6"
+                    inputmode="numeric"
+                    autocomplete="one-time-code">
+            </div>
+
+            <div class="timer">
+                Code expires in <span id="countdown">10:00</span>
+            </div>
+
+            <button type="submit" id="verifyBtn" class="btn btn-primary btn-full btn-mt">
+                <i class="fas fa-check-circle"></i> Verify Code
+            </button>
+        </form>
+
+        <hr class="auth-divider">
+
+        <div class="resend-link">
+            Didn't receive the code?
+            <a href="/resend-code/">Resend Code</a>
+        </div>
+        <div class="resend-link resend-link-mt">
+            <a href="/forgot-password/">← Try different email</a>
+        </div>
+
+    </div>
+</section>
+
+{% endblock %}

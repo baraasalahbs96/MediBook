@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block title %}Payment Successful - MediBook{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="payment_result.css">
+
+<div class="result-section">
+    <div class="result-card result-success">
+        <div class="result-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Payment Successful!</h2>
+        <p>Thank you! Invoice <strong>#{{ bill.id }}</strong> has been paid successfully.</p>
+        <a href="{% url 'patient_billing' %}" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Billing
+        </a>
+    </div>
+</div>
+
+{% endblock %}

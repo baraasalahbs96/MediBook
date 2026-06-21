@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}Message - MediBook{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2><i class="fas fa-envelope"></i> Message</h2>
+</div>
+
+<div class="dashboard-container">
+    <div class="card">
+        <div class="card-header">
+            <span>{{ msg.subject }}</span>
+            <a href="/agent-dashboard/" class="btn btn-sm btn-outline-primary">← Back</a>
+        </div>
+        <div class="card-body">
+            <p><strong>From:</strong> {{ msg.sender.first_name }} {{ msg.sender.last_name }}</p>
+            <p><strong>Date:</strong> {{ msg.created_at|date:"M d, Y" }}</p>
+            <hr>
+            <p>{{ msg.body }}</p>
+
+            {% if msg.is_replied %}
+        <div class="card-header" style="margin-top:8px;">
+            <span><i class="fas fa-reply icon-blue"></i> Your Reply</span>
+        </div>
+        <div style="padding:16px;">
+            <p>{{ msg.reply }}</p>
+            <small>Replied on {{ msg.replied_at|date:"M d, Y H:i" }}</small>
+        </div>
+        {% else %}
+        <div class="card-header" style="margin-top:8px;">
+            <span><i class="fas fa-reply icon-blue"></i> Reply to {{ msg.sender.first_name }}</span>
+        </div>
+            <form method="POST" style="padding:16px;">
+            {% csrf_token %}
+                <div class="form-group">
+                    <textarea name="reply" class="form-control" rows="4" placeholder="Write your reply..." required></textarea>
+                </div>
+                    <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Reply
+                </button>
+            </form>
+        {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

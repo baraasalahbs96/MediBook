@@ -1,0 +1,223 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}MediBook{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- ===== WIDGETS BAR ===== -->
+<div class="widgets-bar">
+
+    <!-- Language Switcher -->
+    <div class="lang-switcher" translate="no">
+        <button type="button" class="lang-btn" onclick="toggleLangDropdown()">
+            <i class="fas fa-globe"></i>
+            <span id="langBtnLabel">EN</span>
+            <i class="fas fa-chevron-down" style="font-size:0.7rem;"></i>
+        </button>
+        <div class="lang-dropdown" id="langDropdown">
+            <button type="button" class="lang-option" onclick="setSiteLanguage('en')">English</button>
+            <button type="button" class="lang-option" onclick="setSiteLanguage('ar')">العربية</button>
+            <div class="lang-powered">Powered by Google Translate</div>
+        </div>
+    </div>
+
+    <!-- Dark / Light Mode Toggle -->
+    <button type="button" class="theme-toggle" onclick="toggleTheme()">
+        <i id="themeIcon" class="fas fa-moon"></i>
+        <span id="themeLabel">Dark</span>
+    </button>
+
+    <!-- Live World Clock -->
+    <div class="clock-widget" translate="no">
+        <i class="fas fa-clock"></i>
+        <select id="clockCountrySelect" class="clock-country-select"></select>
+        <span class="clock-time" id="clockTime">--:--:--</span>
+        <span class="clock-date" id="clockDate">----</span>
+    </div>
+
+    <!-- Accessibility Toggle (in bar) -->
+    <button class="accessibility-toggle-bar" onclick="toggleAccessPanel()" aria-label="Accessibility">
+        <i class="fas fa-universal-access"></i>
+    </button>
+
+    <!-- Accessibility Panel -->
+    <div class="accessibility-panel" id="accessPanel">
+        <h4><i class="fas fa-universal-access"></i> Accessibility</h4>
+        <div class="access-row">
+            <span>Font Size</span>
+            <div class="access-btns">
+                <button onclick="changeFontSize(-1)" aria-label="Decrease font size">A-</button>
+                <button onclick="resetFontSize()" aria-label="Reset font size">A</button>
+                <button onclick="changeFontSize(1)" aria-label="Increase font size">A+</button>
+            </div>
+        </div>
+        <div class="access-row">
+            <span>High Contrast</span>
+            <label class="switch">
+                <input type="checkbox" id="contrastToggle" onchange="toggleContrast()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <div class="access-row">
+            <span>Underline Links</span>
+            <label class="switch">
+                <input type="checkbox" id="underlineToggle" onchange="toggleUnderlineLinks()">
+                <span class="slider"></span>
+            </label>
+        </div>
+        <button class="access-reset" onclick="resetAccessibility()">Reset</button>
+    </div>
+
+</div>
+<!-- ===== END WIDGETS BAR ===== -->
+
+
+<!-- ===== AI ASSISTANT ===== -->
+<button class="ai-chat-toggle" onclick="toggleAiPanel()" aria-label="AI Assistant" title="AI Assistant">
+    <i class="fas fa-robot"></i>
+</button>
+
+<div class="ai-panel" id="aiPanel">
+    <div class="ai-panel-header">
+        <h4><i class="fas fa-robot"></i> MediBook AI</h4>
+        <button class="ai-panel-close" onclick="toggleAiPanel()">&times;</button>
+    </div>
+    <div class="ai-chat-section">
+        <div class="ai-messages" id="aiMessages">
+            <div class="ai-msg-bot">👋 Hi! I'm MediBook AI. How can I help you today?</div>
+        </div>
+        <div class="ai-input-row">
+            <input type="text" id="aiChatInput" class="ai-input"
+                placeholder="Ask anything..."
+                onkeydown="if(event.key==='Enter') sendAiMessage()">
+            <button class="ai-send-btn" id="aiSendBtn" onclick="sendAiMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+<!-- ===== END AI ASSISTANT ===== -->
+
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+    <a class="navbar-brand" href="/">
+        <span>♥</span> MediBook
+    </a>
+
+    <button class="nav-toggle" onclick="toggleNav()">☰</button>
+
+    <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/about/">About Us</a></li>
+        {% if request.session.agent_id %}
+            <li><a href="/agent-dashboard/">Dashboard</a></li>
+            <li><a href="/agent-logout/">Logout</a></li>
+        {% elif request.session.user_id %}
+            <li><a href="/dashboard/">Dashboard</a></li>
+            <li><a href="/logout/">Logout</a></li>
+        {% else %}
+            <li><a href="/login/">Login</a></li>
+            <li><a href="/register/" class="nav-btn">Register</a></li>
+        {% endif %}
+    </ul>
+
+    <!-- Sidebar Toggle Button -->
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+</nav>
+<!-- ===== END NAVBAR ===== -->
+
+
+<!-- ===== SIDE SIDEBAR ===== -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="side-sidebar" id="sideSidebar">
+    <div class="sidebar-header">
+        <h3><i class="fas fa-heartbeat"></i> MediBook</h3>
+        <button class="sidebar-close" onclick="toggleSidebar()">&times;</button>
+    </div>
+    <div class="sidebar-section">
+        <h4>Services</h4>
+        <a href="/"><i class="fas fa-home"></i> Home</a>
+        <a href="/about/"><i class="fas fa-info-circle"></i> About Us</a>
+        <a href="/services/"><i class="fas fa-stethoscope"></i> Services</a>
+    </div>
+    <div class="sidebar-section">
+        <h4>Support & Contact</h4>
+        <a href="/contact/"><i class="fas fa-headset"></i> Support</a>
+        <a href="mailto:support@medibook.com"><i class="fas fa-envelope"></i> support@medibook.com</a>
+        <a href="tel:+1000XXXXXXXX"><i class="fas fa-phone"></i> +1000 000 0000</a>
+    </div>
+    <div class="sidebar-section">
+        <h4>Payment Methods</h4>
+        <p><i class="fas fa-money-bill-wave"></i> Cash</p>
+        <p><i class="fas fa-shield-alt"></i> Insurance</p>
+        <p><i class="fas fa-credit-card"></i> Online</p>
+    </div>
+    <div class="sidebar-section emergency-box">
+        <h4><i class="fas fa-exclamation-triangle"></i> Emergency Contact</h4>
+        <p>Call: <a href="tel:+1000XXXXXXXX">+1000 000 0000</a></p>
+        <p>Email: <a href="mailto:emergency@medibook.com">emergency@medibook.com</a></p>
+        <p class="emergency-warning">
+            <strong>Serious Conditions:</strong><br>
+            Call 911 or go to the nearest hospital.
+        </p>
+    </div>
+    <div class="sidebar-section">
+        <h4>Location</h4>
+        <p><i class="fas fa-map-marker-alt"></i> Princeton, NJ</p>
+        <p><i class="fas fa-phone"></i> +1 000 000  0000</p>
+        <p><i class="fas fa-fax"></i> +1 000 000  0000</p>
+        <p><i class="fas fa-envelope"></i> info@medibook.com</p>
+    </div>
+</aside>
+<!-- ===== END SIDE SIDEBAR ===== -->
+
+
+<!-- ===== PAGE CONTENT ===== -->
+{% block content %}{% endblock %}
+<!-- ===== END PAGE CONTENT ===== -->
+
+
+<!-- ===== FOOTER ===== -->
+<footer>
+    <div class="footer-apps">
+        <h4>Get the App</h4>
+        <div class="store-badges">
+            <a href="#" class="store-badge"><i class="fab fa-apple"></i> App Store</a>
+            <a href="#" class="store-badge"><i class="fab fa-google-play"></i> Google Play</a>
+        </div>
+    </div>
+    <div class="footer-support">
+        <h4>Support</h4>
+        <p><i class="fas fa-phone"></i> +1 000 000  0000</p>
+        <p><i class="fas fa-envelope"></i> support@medibook.com</p>
+        <a href="/contact/">Contact Us</a>
+    </div>
+    <div class="footer-legal">
+        <a href="/privacy-policy/">Privacy Policy</a>
+        <a href="/terms-of-service/">Terms of Service</a>
+    </div>
+    <p>♥ MediBook &mdash; Smart Clinic Management System &copy; 2026</p>
+</footer>
+<!-- ===== END FOOTER ===== -->
+
+
+<script src="{% static 'js/main.js' %}"></script>
+{% block extra_js %}{% endblock %}
+
+<!-- Google Translate -->
+<div id="google_translate_element" style="display:none"></div>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+</html>

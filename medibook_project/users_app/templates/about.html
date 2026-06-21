@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block title %}About Us - MediBook{% endblock %}
+
+{% block content %}
+
+<section class="about-hero">
+    <h1><i class="fas fa-hospital"></i> About MediBook</h1>
+    <p>Transforming healthcare management through smart technology</p>
+</section>
+
+<!-- Mission -->
+<div class="mission-section">
+    <div>
+        <h2>Our Mission</h2>
+        <p>MediBook was built to bridge the gap between patients and healthcare providers. We believe that managing your health should be simple, transparent, and accessible to everyone.</p>
+        <p>From booking appointments to viewing your medical records and paying bills — MediBook puts you in control of your healthcare journey.</p>
+    </div>
+    <div class="values-grid">
+        <div class="value-box">
+            <div class="value-icon"><i class="fas fa-shield-alt"></i></div>
+            <h6>Secure</h6>
+            <p>Your data is always protected</p>
+        </div>
+        <div class="value-box">
+            <div class="value-icon"><i class="fas fa-bolt"></i></div>
+            <h6>Fast</h6>
+            <p>Real-time updates via AJAX</p>
+        </div>
+        <div class="value-box">
+            <div class="value-icon"><i class="fas fa-mobile-alt"></i></div>
+            <h6>Responsive</h6>
+            <p>Works on any device</p>
+        </div>
+        <div class="value-box">
+            <div class="value-icon"><i class="fas fa-heart"></i></div>
+            <h6>Patient First</h6>
+            <p>Designed for real people</p>
+        </div>
+    </div>
+</div>
+
+<!-- Doctors -->
+{% if doctors %}
+<section class="section bg-light">
+    <h2 class="section-title">Our Medical Team</h2>
+    <p class="section-sub">Expert doctors dedicated to your health</p>
+    <div class="doctors-grid">
+        {% for doctor in doctors %}
+        <div class="doctor-card">
+            <div class="doctor-avatar">
+                <i class="fas fa-user-md"></i>
+            </div>
+            <h5>Dr. {{ doctor.name }}</h5>
+            <p class="spec">{{ doctor.specialization }}</p>
+            <p>{{ doctor.bio }}</p>
+            <p class="mt-1 fs-sm text-gray">
+                <i class="fas fa-envelope"></i> {{ doctor.email }}
+            </p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<!-- Contact -->
+<section class="section">
+    <h2 class="section-title">Contact Us</h2>
+    <p class="section-sub mb-3">Have questions? Get in touch with us.</p>
+    <div class="contact-grid">
+        <div class="contact-item">
+            <div class="contact-icon">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <h6>Address</h6>
+            <p>101 avenue St, Princeton, NJ 08536</p>
+        </div>
+        <div class="contact-item">
+            <div class="contact-icon">
+                <i class="fas fa-phone"></i>
+            </div>
+            <h6>Phone</h6>
+            <p>+1 (000) 000-0000</p>
+        </div>
+        <div class="contact-item">
+            <div class="contact-icon">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h6>Email</h6>
+            <p>info@medibook.com</p>
+        </div>
+    </div>
+</section>
+
+{% endblock %}

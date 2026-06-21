@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block title %}Billing Summary - {{ patient.first_name }} {{ patient.last_name }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="header-flex-row">
+        <div>
+            <h2><i class="fas fa-file-invoice-dollar"></i> Billing Summary</h2>
+            <p>{{ patient.first_name }} {{ patient.last_name }} — {{ patient.email }}</p>
+        </div>
+        <a href="{% url 'agent_dashboard' %}" class="btn logout-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-container">
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-green"><i class="fas fa-check-circle"></i></div>
+            <h4>${{ paid_total }}</h4>
+            <p>Paid</p>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-yellow"><i class="fas fa-hourglass-half"></i></div>
+            <h4>${{ unpaid_total }}</h4>
+            <p>Remaining (Unpaid)</p>
+        </div>
+    </div>
+
+    <div class="card mb-2">
+        <div class="card-header">
+            <span><i class="fas fa-hourglass-half icon-yellow"></i> Unpaid / Overdue Bills</span>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr><th>Amount</th><th>Due Date</th><th>Description</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for bill in unpaid_bills %}
+                <tr>
+                    <td>${{ bill.amount }}</td>
+                    <td>{{ bill.due_date }}</td>
+                    <td>{{ bill.description|default:"—" }}</td>
+                    <td><span class="badge badge-{{ bill.status }}">{{ bill.status|capfirst }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty-cell">No unpaid bills</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <span><i class="fas fa-check-circle icon-green"></i> Paid Bills</span>
+        </div>
+        <table class="admin-table">
+            <thead>
+                <tr><th>Amount</th><th>Due Date</th><th>Description</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for bill in paid_bills %}
+                <tr>
+                    <td>${{ bill.amount }}</td>
+                    <td>{{ bill.due_date }}</td>
+                    <td>{{ bill.description|default:"—" }}</td>
+                    <td><span class="badge badge-{{ bill.status }}">{{ bill.status|capfirst }}</span></td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="empty-cell">No paid bills yet</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="/agent-dashboard/patient/{{ patient.id }}/" class="btn btn-primary">
+            <i class="fas fa-user"></i> View Patient Profile
+        </a>
+        <a href="{% url 'agent_dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-th-large"></i> Back to Dashboard
+        </a>
+    </div>
+
+</div>
+{% endblock %}

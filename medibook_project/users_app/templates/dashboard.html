@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard - MediBook{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h2><i class="fas fa-home"></i> <span id="greeting"></span>, {{ user.first_name }}!</h2>
+    <p>Welcome to your MediBook dashboard</p>
+</div>
+
+
+<div class="dashboard-container">
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card" stat-clickable" onclick="window.location.href='{% url 'appointments' %}'">
+            <div class="stat-icon stat-icon-blue">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <h4>{{ appointments|length }}</h4>
+            <p>Upcoming Appointments</p>
+        </div>
+        <div class="stat-card stat-clickable" onclick="window.location.href='{% url 'patient_billing' %}'">
+            <div class="stat-icon stat-icon-yellow">
+                <i class="fas fa-file-invoice-dollar"></i>
+            </div>
+            <h4>{{ bills|length }}</h4>
+            <p>Unpaid Bills</p>
+        </div>
+        <div class="stat-card stat-clickable" onclick="window.location.href='{% url 'health' %}'">
+            <div class="stat-icon stat-icon-green">
+                <i class="fas fa-user-check"></i>
+            </div>
+            <h4>Active</h4>
+            <p>Account Status</p>
+        </div>
+        <div class="stat-card stat-clickable" onclick="window.location.href='{% url 'messages' %}'">
+            <div class="stat-icon stat-icon-blue">
+                <i class="fas fa-envelope"></i>
+            </div>
+            <h4 id="msgCount">...</h4>
+            <p>Messages</p>
+        </div>
+    </div>
+
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+
+        <!-- Appointments -->
+        <div class="card">
+            <div class="card-header">
+                <span><i class="fas fa-calendar-alt icon-blue"></i> Upcoming Appointments</span>
+                <a href="/appointments/" class="btn btn-outline-primary btn-sm">View All</a>
+            </div>
+            {% if appointments %}
+                {% for appt in appointments %}
+                <div class="appt-item">
+                    <div class="appt-info">
+                        <h6>Dr. {{ appt.doctor.name }}</h6>
+                        <small>
+                            <i class="fas fa-clock"></i>
+                            {{ appt.date }} at {{ appt.time }}
+                        </small>
+                    </div>
+                    <span class="badge badge-{{ appt.status }}">
+                        {{ appt.status|capfirst }}
+                    </span>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon"></div>
+                <p>No upcoming appointments</p>
+                <a href="/appointments/" class="btn btn-primary btn-sm">Book Appointment</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column -->
+        <div>
+            <!-- Bills -->
+            <div class="card mb-2">
+                <div class="card-header">
+                    <span><i class="fas fa-file-invoice-dollar icon-gold"></i> Billing Summary</span>
+                </div>
+                <div class="card-body">
+                    {% if bills %}
+                        {% for bill in bills %}
+                        <div class="bill-item">
+                            <div>
+                                <h6>${{ bill.amount }}</h6>
+                                <small>Due: {{ bill.due_date }}</small>
+                            </div>
+                            <span class="badge-unpaid">Unpaid</span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <div class="empty-icon"></div>
+                        <p>No outstanding bills</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="card">
+                <div class="card-header">
+                    <span><i class="fas fa-bolt icon-blue"></i> Quick Actions</span>
+                </div>
+                <div class="quick-actions">
+                    <a href="/appointments/" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i> Book Appointment
+                    </a>
+                    <a href="/messages/" class="btn btn-primary">
+                        <i class="fas fa-envelope"></i> Send Message
+                    </a>
+                    <a href="/health/" class="btn btn-success">
+                        <i class="fas fa-heartbeat"></i> My Health Records
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Doctor Added - MediBook{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="header-flex-row">
+        <div>
+            <h2><i class="fas fa-user-md"></i> Doctor Added</h2>
+            <p>The doctor profile has been created successfully.</p>
+        </div>
+        <a href="{% url 'agent_dashboard' %}" class="btn logout-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <div class="card" style="max-width:600px;margin:0 auto;">
+
+        <div style="text-align:center;padding:28px 16px 12px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:rgba(46,160,90,0.15);
+                        display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <i class="fas fa-check" style="font-size:30px;color:#2ea05a;"></i>
+            </div>
+            <h3 style="margin-bottom:8px;">Doctor Added Successfully</h3>
+        </div>
+
+        <div class="card-header">
+            <span><i class="fas fa-info-circle icon-blue"></i> Doctor Details</span>
+        </div>
+
+        <div class="appt-item">
+            <div class="appt-info">
+                <h6>Dr. {{ doctor.name }}</h6>
+                <small class="doctor-specialization">{{ doctor.specialization }}</small><br>
+                <small class="patient-email"><i class="fas fa-envelope"></i> {{ doctor.email }}</small><br>
+                {% if doctor.phone %}
+                <small class="patient-phone"><i class="fas fa-phone"></i> {{ doctor.phone }}</small>
+                {% endif %}
+            </div>
+        </div>
+
+        <div style="padding:16px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="{% url 'doctors_list' %}" class="btn btn-primary" style="flex:1;text-align:center;">
+                <i class="fas fa-user-md"></i> View All Doctors
+            </a>
+            <a href="{% url 'agent_dashboard' %}" class="btn btn-secondary" style="flex:1;text-align:center;">
+                <i class="fas fa-th-large"></i> Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

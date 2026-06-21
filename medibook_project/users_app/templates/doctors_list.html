@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Doctors - MediBook{% endblock %}
+
+{% block content %}
+
+{% if request.GET.success %}
+<div class="alert alert-success">
+    ✅ Changes saved successfully!
+</div>
+{% endif %} 
+
+
+<div class="dashboard-header">
+    <h2><i class="fas fa-user-md"></i> All Doctors</h2>
+    <p>Total: {{ doctors|length }} doctors</p>
+</div>
+
+<div style="padding: 10px 20px;">
+    <button onclick="history.back()" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+</div>
+
+
+<div class="dashboard-container">
+    <div class="card">
+        <div class="card-body">
+            {% for doctor in doctors %}
+                <a href="{% url 'doctor_detail' doctor.id %}" style="text-decoration:none;">
+                    <div class="bill-item">
+                    <strong>Dr. {{ doctor.name }}</strong>
+                    <small>{{ doctor.specialization }}</small>
+                    <small>{{ doctor.email }}</small>
+                    </div>
+                </a>
+            {% empty %}
+        <p>No doctors found.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

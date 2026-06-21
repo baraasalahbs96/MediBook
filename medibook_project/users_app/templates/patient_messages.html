@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard-header">
+    <h2>Messages</h2>
+</div>
+
+<div style="padding: 10px 20px;">
+    <button onclick="history.back()" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+</div>
+
+
+<div class="dashboard-container">
+    <div class="card">
+        <div class="card-body">
+            <h3>Send a Message</h3>
+            <form method="POST">
+                {% csrf_token %}
+                <div style="margin-bottom:10px;">
+                    <label>Subject</label>
+                    <input type="text" name="subject" class="form-control" value="{{ data.subject|default:'' }}">
+                    {% if errors.subject %}<p style="color:red;">{{ errors.subject }}</p>{% endif %}
+                </div>
+                <div style="margin-bottom:10px;">
+                    <label>Message</label>
+                    <textarea name="body" class="form-control" rows="4">{{ data.body|default:'' }}</textarea>
+                    {% if errors.body %}<p style="color:red;">{{ errors.body }}</p>{% endif %}
+                </div>
+                <button type="submit" class="btn btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+        <div class="card-body">
+            <h3>Your Messages</h3>
+            {% for msg in messages %}
+            <div class="bill-item">
+                <strong>{{ msg.subject }}</strong>
+                <small>{{ msg.created_at }}</small>
+                <p>{{ msg.body }}</p>
+            </div>
+            {% empty %}
+            <p>No messages yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

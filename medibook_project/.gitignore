@@ -1,0 +1,46 @@
+# ─── Python ───
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.so
+
+# ─── Virtual Environment ───
+venv/
+env/
+.venv/
+ENV/
+
+# ─── Django ───
+*.log
+*.pot
+*.pyc
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# ─── Environment Variables ───
+.env
+.env.*
+!.env.example
+
+# ─── IDE ───
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ─── AWS ───
+.aws/
+
+# ─── Node (if any frontend tooling) ───
+node_modules/
+npm-debug.log
+
+# ─── Migrations (optional — remove if you want to track them) ───
+# */migrations/*.py
+# !*/migrations/__init__.py

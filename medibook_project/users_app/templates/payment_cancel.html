@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Payment Cancelled - MediBook{% endblock %}
+
+{% block content %}
+
+<div class="result-section">
+    <div class="result-card result-cancel">
+        <div class="result-icon">
+            <i class="fas fa-times-circle"></i>
+        </div>
+        <h2>Payment Cancelled</h2>
+        <p>Your payment was Cancelled. You can try again anytime.</p>
+        <a href="{% url 'patient_billing' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Billing
+        </a>
+    </div>
+</div>
+
+{% endblock %}

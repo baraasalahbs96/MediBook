@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% block title %}Appointment Confirmed - MediBook{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <div class="header-flex-row">
+        <div>
+            <h2><i class="fas fa-calendar-check"></i> Appointment Confirmed</h2>
+            <p>The appointment was booked and a confirmation email was sent to the patient.</p>
+        </div>
+        <a href="{% url 'agent_dashboard' %}" class="btn logout-btn">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="dashboard-container">
+    <div class="card" style="max-width:600px;margin:0 auto;">
+
+        <div style="text-align:center;padding:28px 16px 12px;">
+            <div style="width:72px;height:72px;border-radius:50%;background:rgba(46,160,90,0.15);
+                        display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <i class="fas fa-check" style="font-size:30px;color:#2ea05a;"></i>
+            </div>
+            <h3 style="margin-bottom:8px;">Appointment Booked Successfully</h3>
+            <span class="badge badge-{{ appt.status }}">{{ appt.status|capfirst }}</span>
+        </div>
+
+        <div class="card-header">
+            <span><i class="fas fa-info-circle icon-blue"></i> Appointment Details</span>
+        </div>
+
+        <div class="appt-item">
+            <div class="appt-info">
+                <h6>Patient</h6>
+                <p>{{ appt.patient.first_name }} {{ appt.patient.last_name }}</p>
+                <small class="patient-email"><i class="fas fa-envelope"></i> {{ appt.patient.email }}</small>
+            </div>
+        </div>
+
+        <div class="appt-item">
+            <div class="appt-info">
+                <h6>Doctor</h6>
+                <p>Dr. {{ appt.doctor.name }} — {{ appt.doctor.specialization }}</p>
+            </div>
+        </div>
+
+        <div class="appt-item">
+            <div class="appt-info">
+                <h6>Date &amp; Time</h6>
+                <p><i class="fas fa-clock"></i> {{ appt.date }} at {{ appt.time }}</p>
+            </div>
+        </div>
+
+        {% if appt.notes %}
+        <div class="appt-item">
+            <div class="appt-info">
+                <h6>Notes</h6>
+                <p>{{ appt.notes }}</p>
+            </div>
+        </div>
+        {% endif %}
+
+        <div style="padding:16px;display:flex;gap:12px;flex-wrap:wrap;">
+            <a href="/agent-dashboard/patient/{{ appt.patient.id }}/" class="btn btn-primary" style="flex:1;text-align:center;">
+                <i class="fas fa-user"></i> View Patient Profile
+            </a>
+            <a href="{% url 'agent_dashboard' %}" class="btn btn-secondary" style="flex:1;text-align:center;">
+                <i class="fas fa-th-large"></i> Back to Dashboard
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

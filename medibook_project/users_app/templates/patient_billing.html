@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Billing - MediBook{% endblock %}
+
+{% block content %}
+
+<div class="dashboard-header">
+    <h2><i class="fas fa-file-invoice-dollar"></i> Billing</h2>
+    <p>Manage your invoices and payments</p>
+</div>
+
+<div style="padding: 10px 20px;">
+    <button onclick="history.back()" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i> Back
+    </button>
+</div>
+
+<div class="billing-container">
+    <div class="card">
+        <div class="card-header">
+            <span><i class="fas fa-list icon-primary"></i>Your Bills</span>
+        </div>
+
+        {% if bills %}
+        <ul class="bills-list">
+            {% for b in bills %}
+            <li class="bill-item">
+                <div class="bill-avatar">
+                    <i class="fas fa-receipt"></i>
+                </div>
+                <div class="bill-info">
+                    <strong>${{ b.amount }}</strong>
+                    <small><i class="fas fa-calendar"></i> {{ b.date|default:"" }}</small>
+                </div>
+                <div class="bill-actions">
+                    <span class="badge badge-{{ b.status }}">{{ b.status|capfirst }}</span>
+                    {% if b.status != 'paid' %}
+                    <a href="{% url 'checkout_session' b.id %}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-credit-card"></i> Pay Now
+                    </a>
+                    {% endif %}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"></div>
+            <p>No bills found.</p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

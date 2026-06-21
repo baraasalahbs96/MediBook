@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}My Appointments - MediBook{% endblock %}
+
+{% block content %}
+
+<div class="appointments-header">
+    <h2><i class="fas fa-calendar-alt"></i> My Appointments</h2>
+    <p>Your upcoming and past appointments</p>
+</div>
+
+
+
+<div class="appointments-container">
+    <div class="card">
+        <div class="card-header">
+            <span><i class="fas fa-list icon-primary"></i>Appointments</span>
+        </div>
+
+        {% if appointments %}
+        <ul class="appointments-list">
+            {% for a in appointments %}
+            <li class="appointment-item">
+                <div class="appt-avatar">
+                    <i class="fas fa-user-md"></i>
+                </div>
+                <div class="appt-info">
+                    <strong>Dr. {{ a.doctor }}</strong>
+                    <small><i class="fas fa-clock"></i> {{ a.date }}</small>
+                </div>
+                <span class="badge badge-{{ a.status|default:'pending' }}">
+                    {{ a.status|default:'Pending'|capfirst }}
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-icon"></div>
+            <p>No appointments found.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
