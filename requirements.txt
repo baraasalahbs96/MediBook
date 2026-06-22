@@ -1,4 +1,3 @@
-requirement.txt
 django
 gunicorn
 whitenoise
